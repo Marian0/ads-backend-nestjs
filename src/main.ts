@@ -1,11 +1,17 @@
+import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
+import { printLog } from "./shared/logger";
 
 async function bootstrap() {
+  // App bootstrap
   const app = await NestFactory.create(AppModule);
-  const appPort = process.env.APP_PORT || 3000;
+
+  //
+  const config = app.get(ConfigService);
+  const appPort = config.get("APP_PORT");
   await app.listen(appPort);
 
-  console.log(`🚀 APP is running on port ${appPort}`);
+  printLog(`🚀 APP is running on port ${appPort}`);
 }
 bootstrap();

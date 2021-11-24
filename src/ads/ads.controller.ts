@@ -1,16 +1,16 @@
 import { Controller, Get, Post, Body } from "@nestjs/common";
-import { AdService } from "./ad.service";
-import { CreateAdDTO } from "./dtos/create-ad.dto";
+import { AdsService } from "./ads.service";
+import { CreateAdDTO } from "./dto/create-ad.dto";
 
 @Controller("ads")
-export class AdController {
-  constructor(private readonly adService: AdService) {}
+export class AdsController {
+  constructor(private readonly adsService: AdsService) {}
   // @ApiOperation({ summary: "Create article" })
   // @ApiResponse({ status: 201, description: "The article has been successfully created." })
   // @ApiResponse({ status: 403, description: "Forbidden." })
   @Post()
   async create(@Body() adData: CreateAdDTO) {
-    return this.adService.create(adData);
+    return this.adsService.create(adData);
   }
 
   @Get()

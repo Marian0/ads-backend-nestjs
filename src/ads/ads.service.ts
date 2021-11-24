@@ -1,26 +1,26 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { CreateAdDTO } from "./dtos/create-ad.dto";
-import { AdEntity } from "./ad.entity";
+import { CreateAdDTO } from "./dto/create-ad.dto";
+import { AdsEntity } from "./ads.entity";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const slug = require("slug");
 
 @Injectable()
-export class AdService {
+export class AdsService {
   constructor(
-    @InjectRepository(AdEntity)
-    private readonly adRepository: Repository<AdEntity>,
+    @InjectRepository(AdsEntity)
+    private readonly adsRepository: Repository<AdsEntity>,
   ) {}
 
-  async create(adData: CreateAdDTO): Promise<AdEntity> {
-    const ad = new AdEntity();
+  async create(adData: CreateAdDTO): Promise<AdsEntity> {
+    const ad = new AdsEntity();
 
     ad.title = adData.title;
     ad.description = adData.description;
     ad.slug = slug(ad.title);
 
-    return await this.adRepository.save(ad);
+    return await this.adsRepository.save(ad);
   }
 }
