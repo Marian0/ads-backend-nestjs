@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Res, Param } from "@nestjs/common";
+import { Controller, Get, Post, Body, Param } from "@nestjs/common";
 import { AdsService } from "./ads.service";
 import { CreateAdDTO } from "./dto/create-ad.dto";
 import { Ad } from "./entities/ad.entity";

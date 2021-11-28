@@ -3,9 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { AdsRepository } from "./ads.repository";
 import { CreateAdDTO } from "./dto/create-ad.dto";
 import { Ad } from "./entities/ad.entity";
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const slug = require("slug");
+import * as slug from "slug";
 
 @Injectable()
 export class AdsService {
