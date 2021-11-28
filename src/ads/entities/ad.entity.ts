@@ -1,14 +1,9 @@
 import { Entity, PrimaryGeneratedColumn, Column, BeforeUpdate } from "typeorm";
-
-export enum AdStatus {
-  PENDING = "PENDING",
-  APPROVED = "APPROVED",
-  BLOCKED = "BLOCKED",
-}
+import { AdStatus } from "./ad-status.enum";
 
 @Entity("ads")
-export class AdsEntity {
-  @PrimaryGeneratedColumn()
+export class Ad {
+  @PrimaryGeneratedColumn("uuid")
   id: number;
 
   @Column()
