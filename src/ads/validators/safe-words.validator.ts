@@ -14,7 +14,7 @@ export class SafeWords implements ValidatorConstraintInterface {
   validate(text: string, args: ValidationArguments) {
     for (let index = 0; index < blackListWords.length; index++) {
       this.badWord = blackListWords[index];
-      const isBadWord = text.toLowerCase().indexOf(this.badWord) >= 0;
+      const isBadWord = text && text.toLowerCase().indexOf(this.badWord) >= 0;
 
       if (isBadWord) {
         return false;

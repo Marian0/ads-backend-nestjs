@@ -17,5 +17,6 @@ export const getTypeOrmConfig = (): TypeOrmModuleOptions => {
     // debug: !isProduction,
     entities,
     // migrations,
+    // autoLoadEntities: true,
   };
 };

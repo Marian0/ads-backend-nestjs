@@ -1,8 +1,8 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { AdsRepository } from "./ads.repository";
 import { CreateAdDTO } from "./dto/create-ad.dto";
-import { AdsEntity } from "./ads.entity";
+import { Ad } from "./entities/ad.entity";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const slug = require("slug");
@@ -10,17 +10,42 @@ const slug = require("slug");
 @Injectable()
 export class AdsService {
   constructor(
-    @InjectRepository(AdsEntity)
-    private readonly adsRepository: Repository<AdsEntity>,
+    @InjectRepository(Ad)
+    private readonly adsRepository: AdsRepository,
   ) {}
 
-  async create(adData: CreateAdDTO): Promise<AdsEntity> {
-    const ad = new AdsEntity();
+  // Checks in db and returs a consecutive indexed slug to be used
+  private async getUniqueSlug(title: string): Promise<string> {
+    let index = 0;
+    while (true) {
+      const slugTemp = slug(title) + (index > 0 ? `-${index}` : "");
+      const found = await this.adsRepository.findOne({ slug: slugTemp });
+      if (!found) {
+        return slugTemp;
+      }
+      index++;
+    }
+  }
 
-    ad.title = adData.title;
-    ad.description = adData.description;
-    ad.slug = slug(ad.title);
+  async create(createAdDto: CreateAdDTO) {
+    // calculate unique slug
+    const slug: string = await this.getUniqueSlug(createAdDto.title);
+
+    const ad = new Ad();
+    ad.title = createAdDto.title;
+    ad.description = createAdDto.description;
+    ad.slug = slug;
 
     return await this.adsRepository.save(ad);
+  }
+
+  async getAdById(id: string): Promise<null | Ad> {
+    const ad = await this.adsRepository.findOne(id);
+
+    if (!ad) {
+      throw new NotFoundException();
+    }
+
+    return ad;
   }
 }
