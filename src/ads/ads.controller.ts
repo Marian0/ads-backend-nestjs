@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, Patch, Req } from "@nestjs/common";
+import { Controller, Get, Post, Body, Param, Delete, Patch, Query } from "@nestjs/common";
 import { AdsService } from "./ads.service";
 import { ChangeStatusAdDTO } from "./dto/change-status-ad.dto";
 import { CreateAdDTO } from "./dto/create-ad.dto";
@@ -17,7 +17,7 @@ export class AdsController {
   }
 
   @Get()
-  findAll(@Req() getAdsDto: GetAdsDTO): Promise<Ad[]> {
+  findAll(@Query() getAdsDto: GetAdsDTO): Promise<Ad[]> {
     return this.adsService.getAds(getAdsDto);
   }
 

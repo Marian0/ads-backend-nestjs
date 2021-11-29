@@ -1,4 +1,4 @@
-import { EntityRepository, Repository } from "typeorm";
+import { Brackets, EntityRepository, Repository } from "typeorm";
 import { CreateAdDTO } from "./dto/create-ad.dto";
 import { Ad } from "./entities/ad.entity";
 import * as slug from "slug";
@@ -31,9 +31,25 @@ export class AdsRepository extends Repository<Ad> {
   }
 
   async getAds(getAdsDto: GetAdsDTO): Promise<Ad[]> {
-    const query = this.createQueryBuilder("ad");
+    const query = this.createQueryBuilder("ads");
 
-    //@todo: add filtering to query
+    const { status, keywords } = getAdsDto;
+
+    if (status) {
+      query.andWhere("ads.status = :status", { status });
+    }
+
+    if (keywords) {
+      const wilcardKeywords = `%${keywords}%`;
+      query.andWhere(
+        new Brackets((qb) => {
+          qb.where("ads.title LIKE :keywords", { keywords: wilcardKeywords }).orWhere(
+            "ads.description LIKE :keywords",
+            { keywords: wilcardKeywords },
+          );
+        }),
+      );
+    }
 
     const ads = await query.getMany();
 
