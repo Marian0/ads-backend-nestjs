@@ -1,6 +1,8 @@
-import { Controller, Get, Post, Body, Param } from "@nestjs/common";
+import { Controller, Get, Post, Body, Param, Delete, Patch, Query } from "@nestjs/common";
 import { AdsService } from "./ads.service";
+import { ChangeStatusAdDTO } from "./dto/change-status-ad.dto";
 import { CreateAdDTO } from "./dto/create-ad.dto";
+import { GetAdsDTO } from "./dto/get-ads.dto";
 import { Ad } from "./entities/ad.entity";
 
 @Controller("ads")
@@ -10,18 +12,28 @@ export class AdsController {
   // @ApiResponse({ status: 201, description: "The article has been successfully created." })
   // @ApiResponse({ status: 403, description: "Forbidden." })
   @Post()
-  async create(@Body() createAdDto: CreateAdDTO) {
+  create(@Body() createAdDto: CreateAdDTO) {
     return this.adsService.create(createAdDto);
   }
 
-  // @Get()
-  // findAll(@Res() res): string {
-  //   sample responding a custom http status
-  //   return res.status(222).send("TEST");
-  // }
+  @Get()
+  findAll(@Query() getAdsDto: GetAdsDTO): Promise<Ad[]> {
+    return this.adsService.getAds(getAdsDto);
+  }
 
   @Get("/:id")
-  async findOne(@Param("id") id: string): Promise<Ad> {
+  findOne(@Param("id") id: string): Promise<Ad> {
     return this.adsService.getAdById(id);
+  }
+
+  @Delete("/:id")
+  delete(@Param("id") id: string): Promise<void> {
+    return this.adsService.delete(id);
+  }
+
+  @Patch("/:id")
+  update(@Param("id") id: string, @Body() changeStatusAdDto: ChangeStatusAdDTO) {
+    const { status } = changeStatusAdDto;
+    return this.adsService.updateStatus(id, status);
   }
 }

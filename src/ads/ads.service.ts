@@ -1,40 +1,21 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { DeleteResult } from "typeorm";
 import { AdsRepository } from "./ads.repository";
 import { CreateAdDTO } from "./dto/create-ad.dto";
+import { GetAdsDTO } from "./dto/get-ads.dto";
+import { AdStatus } from "./entities/ad-status.enum";
 import { Ad } from "./entities/ad.entity";
-import * as slug from "slug";
 
 @Injectable()
 export class AdsService {
   constructor(
-    @InjectRepository(Ad)
+    @InjectRepository(AdsRepository)
     private readonly adsRepository: AdsRepository,
   ) {}
 
-  // Checks in db and returs a consecutive indexed slug to be used
-  private async getUniqueSlug(title: string): Promise<string> {
-    let index = 0;
-    while (true) {
-      const slugTemp = slug(title) + (index > 0 ? `-${index}` : "");
-      const found = await this.adsRepository.findOne({ slug: slugTemp });
-      if (!found) {
-        return slugTemp;
-      }
-      index++;
-    }
-  }
-
-  async create(createAdDto: CreateAdDTO) {
-    // calculate unique slug
-    const slug: string = await this.getUniqueSlug(createAdDto.title);
-
-    const ad = new Ad();
-    ad.title = createAdDto.title;
-    ad.description = createAdDto.description;
-    ad.slug = slug;
-
-    return await this.adsRepository.save(ad);
+  create(createAdDto: CreateAdDTO) {
+    return this.adsRepository.createAd(createAdDto);
   }
 
   async getAdById(id: string): Promise<null | Ad> {
@@ -43,6 +24,27 @@ export class AdsService {
     if (!ad) {
       throw new NotFoundException();
     }
+
+    return ad;
+  }
+
+  async getAds(getAdsDto: GetAdsDTO): Promise<Ad[]> {
+    return this.adsRepository.getAds(getAdsDto);
+  }
+
+  async delete(id: string) {
+    const result: DeleteResult = await this.adsRepository.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException();
+    }
+  }
+
+  async updateStatus(id: string, status: AdStatus) {
+    const ad = await this.getAdById(id);
+
+    ad.status = status;
+
+    await this.adsRepository.save(ad);
 
     return ad;
   }
