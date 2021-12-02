@@ -1,26 +1,15 @@
 import { Entity, PrimaryGeneratedColumn, Column, BeforeUpdate } from "typeorm";
-import { AdStatus } from "./ad-status.enum";
 
-@Entity("ads")
-export class Ad {
+@Entity("users")
+export class User {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column()
-  slug: string;
+  @Column({ unique: true })
+  email: string;
 
   @Column()
-  title: string;
-
-  @Column({ default: "" })
-  description: string;
-
-  @Column({
-    type: "enum",
-    enum: AdStatus,
-    default: AdStatus.PENDING,
-  })
-  status: AdStatus;
+  password: string;
 
   @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   created_at: Date;

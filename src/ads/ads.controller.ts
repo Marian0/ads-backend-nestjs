@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Param, Delete, Patch, Query } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Patch,
+  Query,
+  UseGuards,
+} from "@nestjs/common";
+import { AuthGuard } from "@nestjs/passport";
 import { AdsService } from "./ads.service";
 import { ChangeStatusAdDTO } from "./dto/change-status-ad.dto";
 import { CreateAdDTO } from "./dto/create-ad.dto";
@@ -6,6 +17,7 @@ import { GetAdsDTO } from "./dto/get-ads.dto";
 import { Ad } from "./entities/ad.entity";
 
 @Controller("ads")
+@UseGuards(AuthGuard())
 export class AdsController {
   constructor(private readonly adsService: AdsService) {}
   // @ApiOperation({ summary: "Create article" })
