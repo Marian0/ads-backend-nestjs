@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { DeleteResult } from "typeorm";
+import { User } from "src/auth/entities/user.entity";
 import { AdsRepository } from "./ads.repository";
 import { CreateAdDTO } from "./dto/create-ad.dto";
 import { GetAdsDTO } from "./dto/get-ads.dto";
@@ -14,12 +14,12 @@ export class AdsService {
     private readonly adsRepository: AdsRepository,
   ) {}
 
-  create(createAdDto: CreateAdDTO) {
-    return this.adsRepository.createAd(createAdDto);
+  create(createAdDto: CreateAdDTO, user: User) {
+    return this.adsRepository.createAd(createAdDto, user);
   }
 
   async getAdById(id: string): Promise<null | Ad> {
-    const ad = await this.adsRepository.findOne(id);
+    const ad = await this.adsRepository.findOne({ id });
 
     if (!ad) {
       throw new NotFoundException();
@@ -28,19 +28,26 @@ export class AdsService {
     return ad;
   }
 
-  async getAds(getAdsDto: GetAdsDTO): Promise<Ad[]> {
-    return this.adsRepository.getAds(getAdsDto);
+  async getAds(getAdsDto: GetAdsDTO, user: User | undefined = null): Promise<Ad[]> {
+    return this.adsRepository.getAds(getAdsDto, user);
   }
 
-  async delete(id: string) {
-    const result: DeleteResult = await this.adsRepository.delete(id);
-    if (result.affected === 0) {
-      throw new NotFoundException();
-    }
-  }
-
-  async updateStatus(id: string, status: AdStatus) {
+  async delete(id: string, user: User | undefined = null): Promise<void> {
     const ad = await this.getAdById(id);
+
+    if (user && user !== ad.user) {
+      throw new UnauthorizedException();
+    }
+
+    await this.adsRepository.delete(id);
+  }
+
+  async updateStatus(id: string, status: AdStatus, user: User | null = null) {
+    const ad = await this.getAdById(id);
+
+    if (user && user !== ad.user) {
+      throw new UnauthorizedException();
+    }
 
     ad.status = status;
 

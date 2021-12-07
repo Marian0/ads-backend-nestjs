@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, BeforeUpdate } from "typeorm";
+import { Ad } from "src/ads/entities/ad.entity";
+import { Entity, PrimaryGeneratedColumn, Column, BeforeUpdate, OneToMany } from "typeorm";
 
 @Entity("users")
 export class User {
@@ -21,4 +22,7 @@ export class User {
   updateTimestamp() {
     this.updated_at = new Date();
   }
+
+  @OneToMany((_type) => Ad, (ad: Ad) => ad.user, { eager: true })
+  ads: Ad[];
 }

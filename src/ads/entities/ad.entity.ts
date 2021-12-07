@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, BeforeUpdate } from "typeorm";
+import { User } from "src/auth/entities/user.entity";
+import { Entity, PrimaryGeneratedColumn, Column, BeforeUpdate, ManyToOne } from "typeorm";
 import { AdStatus } from "./ad-status.enum";
 
 @Entity("ads")
@@ -32,4 +33,7 @@ export class Ad {
   updateTimestamp() {
     this.updated_at = new Date();
   }
+
+  @ManyToOne((_type) => User, (user: User) => user.ads, { eager: false })
+  user: User;
 }

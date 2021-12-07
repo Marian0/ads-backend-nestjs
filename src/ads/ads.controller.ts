@@ -10,6 +10,8 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
+import { User } from "src/auth/entities/user.entity";
+import { GetUser } from "src/auth/get-user.decorator";
 import { AdsService } from "./ads.service";
 import { ChangeStatusAdDTO } from "./dto/change-status-ad.dto";
 import { CreateAdDTO } from "./dto/create-ad.dto";
@@ -17,15 +19,15 @@ import { GetAdsDTO } from "./dto/get-ads.dto";
 import { Ad } from "./entities/ad.entity";
 
 @Controller("ads")
-@UseGuards(AuthGuard())
 export class AdsController {
   constructor(private readonly adsService: AdsService) {}
   // @ApiOperation({ summary: "Create article" })
   // @ApiResponse({ status: 201, description: "The article has been successfully created." })
   // @ApiResponse({ status: 403, description: "Forbidden." })
   @Post()
-  create(@Body() createAdDto: CreateAdDTO) {
-    return this.adsService.create(createAdDto);
+  @UseGuards(AuthGuard())
+  create(@Body() createAdDto: CreateAdDTO, @GetUser() user: User) {
+    return this.adsService.create(createAdDto, user);
   }
 
   @Get()
@@ -39,13 +41,19 @@ export class AdsController {
   }
 
   @Delete("/:id")
-  delete(@Param("id") id: string): Promise<void> {
-    return this.adsService.delete(id);
+  @UseGuards(AuthGuard())
+  delete(@Param("id") id: string, @GetUser() user: User): Promise<void> {
+    return this.adsService.delete(id, user);
   }
 
   @Patch("/:id")
-  update(@Param("id") id: string, @Body() changeStatusAdDto: ChangeStatusAdDTO) {
+  @UseGuards(AuthGuard())
+  update(
+    @Param("id") id: string,
+    @Body() changeStatusAdDto: ChangeStatusAdDTO,
+    @GetUser() user: User,
+  ) {
     const { status } = changeStatusAdDto;
-    return this.adsService.updateStatus(id, status);
+    return this.adsService.updateStatus(id, status, user);
   }
 }
