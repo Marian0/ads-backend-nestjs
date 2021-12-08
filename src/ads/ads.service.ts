@@ -1,6 +1,13 @@
-import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "src/auth/entities/user.entity";
+import { ActionTypes } from "src/casl/action-types.enum";
+import { CaslAbilityFactory } from "src/casl/casl-ability.factory";
 import { AdsRepository } from "./ads.repository";
 import { CreateAdDTO } from "./dto/create-ad.dto";
 import { GetAdsDTO } from "./dto/get-ads.dto";
@@ -12,6 +19,7 @@ export class AdsService {
   constructor(
     @InjectRepository(AdsRepository)
     private readonly adsRepository: AdsRepository,
+    private caslAbilityFactory: CaslAbilityFactory,
   ) {}
 
   create(createAdDto: CreateAdDTO, user: User) {
@@ -34,11 +42,10 @@ export class AdsService {
 
   async delete(id: string, user: User | undefined = null): Promise<void> {
     const ad = await this.getAdById(id);
-
-    if (user && user !== ad.user) {
-      throw new UnauthorizedException();
+    const ability = this.caslAbilityFactory.createForUser(user);
+    if (!ability.can(ActionTypes.Delete, ad)) {
+      throw new ForbiddenException();
     }
-
     await this.adsRepository.delete(id);
   }
 

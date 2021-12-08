@@ -4,6 +4,7 @@ import { ConfigModule } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AppConfig, getTypeOrmConfig } from "./shared/config";
 import { AuthModule } from "./auth/auth.module";
+import { CaslModule } from "./casl/casl.module";
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { AuthModule } from "./auth/auth.module";
     TypeOrmModule.forRoot(getTypeOrmConfig()),
     AdsModule,
     AuthModule,
+    CaslModule,
   ],
   controllers: [],
   providers: [],

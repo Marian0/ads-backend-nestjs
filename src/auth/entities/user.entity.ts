@@ -1,5 +1,5 @@
 import { Ad } from "src/ads/entities/ad.entity";
-import { Entity, PrimaryGeneratedColumn, Column, BeforeUpdate, OneToMany, Index } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BeforeUpdate, OneToMany } from "typeorm";
 import { Role } from "./role.enum";
 
 @Entity("users")
@@ -8,7 +8,6 @@ export class User {
   id: string;
 
   @Column({ unique: true })
-  @Index()
   email: string;
 
   @Column()
