@@ -1,5 +1,6 @@
 import { Ad } from "src/ads/entities/ad.entity";
-import { Entity, PrimaryGeneratedColumn, Column, BeforeUpdate, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BeforeUpdate, OneToMany, Index } from "typeorm";
+import { Role } from "./role.enum";
 
 @Entity("users")
 export class User {
@@ -7,6 +8,7 @@ export class User {
   id: string;
 
   @Column({ unique: true })
+  @Index()
   email: string;
 
   @Column()
@@ -22,6 +24,13 @@ export class User {
   updateTimestamp() {
     this.updated_at = new Date();
   }
+
+  @Column({
+    type: "enum",
+    enum: Role,
+    default: Role.USER,
+  })
+  public role: Role;
 
   @OneToMany((_type) => Ad, (ad: Ad) => ad.user, { eager: true })
   ads: Ad[];
