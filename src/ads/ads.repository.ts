@@ -33,13 +33,13 @@ export class AdsRepository extends Repository<Ad> {
     return await this.save(ad);
   }
 
-  async getAds(getAdsDto: GetAdsDTO, user: User | null): Promise<Ad[]> {
+  async getAds(getAdsDto: GetAdsDTO): Promise<Ad[]> {
     const query = this.createQueryBuilder("ads");
 
     const { status, keywords } = getAdsDto;
 
-    if (user) {
-      query.andWhere({ user });
+    if (getAdsDto.user_id) {
+      query.andWhere({ user: getAdsDto.user_id });
     } else {
       // Add user relation
       query.leftJoinAndSelect("ads.user", "user");

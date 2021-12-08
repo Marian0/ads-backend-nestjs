@@ -1,4 +1,4 @@
-import { IsEnum, IsOptional } from "class-validator";
+import { IsEnum, IsOptional, IsString, IsUUID } from "class-validator";
 import { AdStatus } from "../entities/ad-status.enum";
 
 export class GetAdsDTO {
@@ -8,4 +8,9 @@ export class GetAdsDTO {
   @IsOptional()
   @IsEnum(AdStatus)
   readonly status?: AdStatus;
+
+  @IsOptional()
+  @IsString()
+  @IsUUID()
+  readonly user_id?: string;
 }

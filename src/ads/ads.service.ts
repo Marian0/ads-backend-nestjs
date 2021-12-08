@@ -28,8 +28,8 @@ export class AdsService {
     return ad;
   }
 
-  async getAds(getAdsDto: GetAdsDTO, user: User | undefined = null): Promise<Ad[]> {
-    return this.adsRepository.getAds(getAdsDto, user);
+  async getAds(getAdsDto: GetAdsDTO): Promise<Ad[]> {
+    return this.adsRepository.getAds(getAdsDto);
   }
 
   async delete(id: string, user: User | undefined = null): Promise<void> {
