@@ -32,6 +32,6 @@ export class User {
   })
   public role: Role;
 
-  @OneToMany((_type) => Ad, (ad: Ad) => ad.user, { eager: true })
+  @OneToMany((_type) => Ad, (ad: Ad) => ad.user, { eager: false })
   ads: Ad[];
 }

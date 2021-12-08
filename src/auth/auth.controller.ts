@@ -10,14 +10,22 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post("/signup")
-  signUp(@Body() userSignUpDto: UserSignUpDTO): Promise<User> {
-    return this.authService.singup(userSignUpDto);
+  async signUp(@Body() userSignUpDto: UserSignUpDTO) {
+    const { password, ...userClean } = await this.authService.singup(userSignUpDto);
+    return userClean;
   }
 
   @Post("/signin")
   signIn(@Body() userSignUpDto: UserSignUpDTO): Promise<{ accessToken: string }> {
     return this.authService.signin(userSignUpDto);
   }
+
+  // Refresh token endpoint should be implemented
+  // @Post("/refresh")
+  // @UseGuards(AuthGuard())
+  // refresh(): Promise<{ accessToken: string }> {
+  //   return this.authService.signin(userSignUpDto);
+  // }
 
   @Get("/me")
   @UseGuards(AuthGuard())
