@@ -40,6 +40,9 @@ export class AdsRepository extends Repository<Ad> {
 
     if (user) {
       query.andWhere({ user });
+    } else {
+      // Add user relation
+      query.leftJoinAndSelect("ads.user", "user");
     }
 
     if (status) {
