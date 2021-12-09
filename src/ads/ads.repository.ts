@@ -39,7 +39,7 @@ export class AdsRepository extends Repository<Ad> {
     const { status, keywords } = getAdsDto;
 
     if (getAdsDto.user_id) {
-      query.andWhere({ user: getAdsDto.user_id });
+      query.andWhere({ userId: getAdsDto.user_id });
     } else {
       // Add user relation
       query.leftJoinAndSelect("ads.user", "user");
