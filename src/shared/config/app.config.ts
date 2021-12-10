@@ -10,6 +10,8 @@ export type AppConfigType = {
   MYSQL_PASSWORD: string;
   MYSQL_DATABASE: string;
   APP_PORT: number;
+  JWT_SECRET: string;
+  JWT_LIFETIME_SECONDS: number;
 };
 
 export const AppConfig: ConfigModuleOptions = {
@@ -22,6 +24,8 @@ export const AppConfig: ConfigModuleOptions = {
     MYSQL_PASSWORD: Joi.string().required(),
     MYSQL_DATABASE: Joi.string().required(),
     APP_PORT: Joi.number().required(),
+    JWT_SECRET: Joi.string().required(),
+    JWT_LIFETIME_SECONDS: Joi.number().required(),
   }),
   validationOptions: {
     allowUnknown: true,

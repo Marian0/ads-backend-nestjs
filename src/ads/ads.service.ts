@@ -1,6 +1,8 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { DeleteResult } from "typeorm";
+import { User } from "src/auth/entities/user.entity";
+import { ActionTypes } from "src/casl/action-types.enum";
+import { CaslAbilityFactory } from "src/casl/casl-ability.factory";
 import { AdsRepository } from "./ads.repository";
 import { CreateAdDTO } from "./dto/create-ad.dto";
 import { GetAdsDTO } from "./dto/get-ads.dto";
@@ -12,14 +14,15 @@ export class AdsService {
   constructor(
     @InjectRepository(AdsRepository)
     private readonly adsRepository: AdsRepository,
+    private caslAbilityFactory: CaslAbilityFactory,
   ) {}
 
-  create(createAdDto: CreateAdDTO) {
-    return this.adsRepository.createAd(createAdDto);
+  create(createAdDto: CreateAdDTO, user: User) {
+    return this.adsRepository.createAd(createAdDto, user);
   }
 
   async getAdById(id: string): Promise<null | Ad> {
-    const ad = await this.adsRepository.findOne(id);
+    const ad = await this.adsRepository.findOne({ id });
 
     if (!ad) {
       throw new NotFoundException();
@@ -28,19 +31,42 @@ export class AdsService {
     return ad;
   }
 
-  async getAds(getAdsDto: GetAdsDTO): Promise<Ad[]> {
+  async getAdBySlug(slug: string): Promise<null | Ad> {
+    const ad = await this.adsRepository.findOne({ slug });
+
+    if (!ad) {
+      throw new NotFoundException();
+    }
+
+    return ad;
+  }
+
+  async getAds(getAdsDto: GetAdsDTO, user: User = null): Promise<Ad[]> {
+    if (user) {
+      const ability = this.caslAbilityFactory.createForUser(user);
+      if (!ability.can(ActionTypes.Read, "all")) {
+        throw new ForbiddenException();
+      }
+    }
     return this.adsRepository.getAds(getAdsDto);
   }
 
-  async delete(id: string) {
-    const result: DeleteResult = await this.adsRepository.delete(id);
-    if (result.affected === 0) {
-      throw new NotFoundException();
+  async delete(id: string, user: User | undefined = null): Promise<void> {
+    const ad = await this.getAdById(id);
+    const ability = this.caslAbilityFactory.createForUser(user);
+    if (!ability.can(ActionTypes.Delete, ad)) {
+      throw new ForbiddenException();
     }
+    await this.adsRepository.delete(id);
   }
 
-  async updateStatus(id: string, status: AdStatus) {
+  async updateStatus(id: string, status: AdStatus, user: User | null = null) {
     const ad = await this.getAdById(id);
+
+    const ability = this.caslAbilityFactory.createForUser(user);
+    if (!ability.can(ActionTypes.Update, ad)) {
+      throw new ForbiddenException();
+    }
 
     ad.status = status;
 

@@ -1,10 +1,18 @@
-import { Entity, PrimaryGeneratedColumn, Column, BeforeUpdate } from "typeorm";
+import { User } from "src/auth/entities/user.entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  BeforeUpdate,
+  ManyToOne,
+  JoinColumn,
+} from "typeorm";
 import { AdStatus } from "./ad-status.enum";
 
 @Entity("ads")
 export class Ad {
   @PrimaryGeneratedColumn("uuid")
-  id: number;
+  id: string;
 
   @Column()
   slug: string;
@@ -32,4 +40,11 @@ export class Ad {
   updateTimestamp() {
     this.updated_at = new Date();
   }
+
+  @Column({ nullable: true })
+  userId: string;
+
+  @ManyToOne((_type) => User, (user: User) => user.ads)
+  @JoinColumn({ name: "userId" })
+  user: User;
 }
