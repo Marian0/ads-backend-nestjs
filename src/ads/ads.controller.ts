@@ -8,8 +8,10 @@ import {
   Patch,
   Query,
   UseGuards,
+  SetMetadata,
 } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
+import { RolesGuard } from "../auth/roles.guard";
 import { User } from "src/auth/entities/user.entity";
 import { GetUser } from "src/auth/get-user.decorator";
 import { AdsService } from "./ads.service";
@@ -17,6 +19,7 @@ import { ChangeStatusAdDTO } from "./dto/change-status-ad.dto";
 import { CreateAdDTO } from "./dto/create-ad.dto";
 import { GetAdsDTO } from "./dto/get-ads.dto";
 import { Ad } from "./entities/ad.entity";
+import { Role } from "src/auth/entities/role.enum";
 
 @Controller("ads")
 export class AdsController {
@@ -36,8 +39,13 @@ export class AdsController {
   }
 
   @Get("/:id")
-  findOne(@Param("id") id: string): Promise<Ad> {
+  findOneByID(@Param("id") id: string): Promise<Ad> {
     return this.adsService.getAdById(id);
+  }
+
+  @Get("/:slug")
+  findOneBySlug(@Param("slug") slug: string): Promise<Ad> {
+    return this.adsService.getAdBySlug(slug);
   }
 
   @Delete("/:id")
@@ -47,7 +55,8 @@ export class AdsController {
   }
 
   @Patch("/:id")
-  @UseGuards(AuthGuard())
+  @UseGuards(AuthGuard(), RolesGuard)
+  @SetMetadata("roles", [Role.ADMIN])
   update(
     @Param("id") id: string,
     @Body() changeStatusAdDto: ChangeStatusAdDTO,

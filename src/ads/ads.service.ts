@@ -1,9 +1,4 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from "@nestjs/common";
+import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "src/auth/entities/user.entity";
 import { ActionTypes } from "src/casl/action-types.enum";
@@ -36,7 +31,23 @@ export class AdsService {
     return ad;
   }
 
-  async getAds(getAdsDto: GetAdsDTO): Promise<Ad[]> {
+  async getAdBySlug(slug: string): Promise<null | Ad> {
+    const ad = await this.adsRepository.findOne({ slug });
+
+    if (!ad) {
+      throw new NotFoundException();
+    }
+
+    return ad;
+  }
+
+  async getAds(getAdsDto: GetAdsDTO, user: User = null): Promise<Ad[]> {
+    if (user) {
+      const ability = this.caslAbilityFactory.createForUser(user);
+      if (!ability.can(ActionTypes.Read, "all")) {
+        throw new ForbiddenException();
+      }
+    }
     return this.adsRepository.getAds(getAdsDto);
   }
 
@@ -52,8 +63,9 @@ export class AdsService {
   async updateStatus(id: string, status: AdStatus, user: User | null = null) {
     const ad = await this.getAdById(id);
 
-    if (user && user !== ad.user) {
-      throw new UnauthorizedException();
+    const ability = this.caslAbilityFactory.createForUser(user);
+    if (!ability.can(ActionTypes.Update, ad)) {
+      throw new ForbiddenException();
     }
 
     ad.status = status;
