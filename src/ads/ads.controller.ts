@@ -38,11 +38,6 @@ export class AdsController {
     return this.adsService.getAds(getAdsDto);
   }
 
-  @Get("/:id")
-  findOneByID(@Param("id") id: string): Promise<Ad> {
-    return this.adsService.getAdById(id);
-  }
-
   @Get("/:slug")
   findOneBySlug(@Param("slug") slug: string): Promise<Ad> {
     return this.adsService.getAdBySlug(slug);
